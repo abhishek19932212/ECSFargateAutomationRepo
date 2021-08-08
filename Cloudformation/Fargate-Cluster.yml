@@ -124,6 +124,10 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
 
   # Creat a security group for Containers and open in bound Container port from Load balancer security group to the Container 
   ContainerSecurityGroup:
@@ -171,6 +175,20 @@ Resources:
       LoadBalancerArn: !Ref LoadBalancer
       Port: 80
       Protocol: HTTP
+
+  LoadBalancerListener2:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions: 
+        - TargetGroupArn: !Ref TargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: ELBSecurityPolicy-2016-08
+      #Change Certificate ARN with your certificate ARN
+      Certificates:
+        - CertificateArn: arn:aws:acm:us-west-2:168239185000:certificate/fbbf34fa-2fe0-47bf-8872-d214c9f629a1
 
   # Create an ECS Service and add created Cluster, TaskDefintion, Subnets, TargetGroup and SecurityGroup
   ECSService:
